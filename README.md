@@ -20,11 +20,12 @@ The application will be available at `http://localhost:8000`.
 ## Available Commands
 
 - **help**: List all available commands
-- **all**: Build and run the Docker container.
+- **start**: Build and run the Docker container.
 - **build**: Build a Docker container from the `Dockerfile` named `fastapi-template`.
 - **run**: Run the Docker container named `fastapi-template` with the source code bound to the container.
 - **check-ty**: Check the code inside the `/src` directory with `ty`.
 - **check-ruff**: Check the code inside the `/src` directory with `ruff`.
+- **check-all**: Check the code inside the `/src` directory with `ty` and `ruff`.
 
 ## Project Structure Guidelines
 
