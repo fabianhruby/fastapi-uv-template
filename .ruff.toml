@@ -12,7 +12,7 @@ lint.select = [
     "PLE", "PLR", "PLW", "NPY", "RUF", "A", "B", "COM",
     "C4", "DTZ", "EM", "ISC", "ICN", "G", "ARG", "PTH"
 ]
-lint.ignore = ["ANN", "ISC003", "PLW2901"]
+lint.ignore = ["ANN", "ISC003", "PLW2901", "G004"]
 lint.fixable = [
     "A", "C", "D", "E", "F", "G", "I", "N", "Q", "S", "T",
     "W", "ANN", "ARG", "BLE", "COM", "DJ", "DTZ", "EM",
