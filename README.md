@@ -127,15 +127,15 @@ To add your own API endpoints and logic:
 
 ### Logging
 
-The logging middleware is configured based on the `stage` variable in the `.env` file.
+Logging is configured by the `STAGE` setting in `.env`, using the mapping defined in `src/core/logging.py`. The root logger format includes timestamp, level, name and message. Uvicorn access logs are suppressed to WARNING.
 
-The available stages are:
-- `local`: `DEBUG` level logging
-- `dev`: `INFO` level logging
-- `test`: `WARNING` level logging
-- `prod`: `INFO` level logging
+The available stages and corresponding log levels are:
+- `local`: DEBUG
+- `dev`: INFO
+- `test`: WARNING
+- `prod`: INFO
 
 **Example `.env` configuration:**
 ```sh
-stage=local
+STAGE=local
 ```
