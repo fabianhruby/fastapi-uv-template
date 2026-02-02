@@ -1,8 +1,17 @@
 """Settings for the app."""
 
-from typing import Literal
+from enum import Enum
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Stage(Enum):
+    """Represents the deployment stage."""
+
+    LOCAL = "local"
+    DEV = "dev"
+    TEST = "test"
+    PROD = "prod"
 
 
 class Settings(BaseSettings):
@@ -15,7 +24,7 @@ class Settings(BaseSettings):
     description: str = "A template for implementing APIs with FastAPI"
     contact: dict = {"name": "Fabian Simon Hruby", "email": "fabian.hruby@gmail.com"}
 
-    stage: Literal["local", "dev", "test", "prod"] = "local"
+    stage: Stage = Stage.LOCAL
 
 
 settings = Settings()

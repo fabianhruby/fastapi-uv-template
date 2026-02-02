@@ -15,7 +15,7 @@ async def health() -> JSONResponse:
     JSONResponse
         A JSON response indicating the health status of the app.
     """
-    return {"status": "ready"}  # ty:ignore[invalid-return-type]
+    return JSONResponse(content={"status": "ready"})
 
 
 @core_router.get(path="/live")
@@ -27,4 +27,4 @@ async def live() -> JSONResponse:
     JSONResponse
         A JSON response indicating the live status of the app.
     """
-    return {"status": "alive"}  # ty:ignore[invalid-return-type]
+    return JSONResponse(content={"status": "alive"})

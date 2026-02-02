@@ -11,6 +11,11 @@ STAGE_LOG_LEVEL: dict[str, str | int] = {
 
 
 def configure_logging(settings) -> None:
-    """Configure  logging based on the stage."""
-    level: str | int = STAGE_LOG_LEVEL.get(settings.stage.lower(), "local")
-    logging.basicConfig(level=level)
+    """Configure logging based on the stage."""
+    level: str | int = STAGE_LOG_LEVEL.get(settings.stage.value, logging.DEBUG)
+    logging.basicConfig(
+        level=level,
+        format="%(asctime)s %(levelname)s %(name)s %(message)s",
+        force=True,
+    )
+    logging.getLogger("uvicorn.access").setLevel(logging.WARNING)

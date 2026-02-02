@@ -20,6 +20,6 @@ def create_app(settings) -> FastAPI:
     )
 
     app.include_router(router=core_router)
-    app.add_middleware(middleware_class=LoggingMiddleware)  # ty:ignore
+    app.add_middleware(LoggingMiddleware)  # ty:ignore
 
     return app
