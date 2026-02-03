@@ -12,7 +12,9 @@ A production-ready template for building high-performance APIs with FastAPI, usi
 - **Blazing Fast Toolkit:** Uses `uv` for dependency management and `ruff` for linting, both from [Astral](https://astral.sh/).
 - **Structured Logging:** Centralized and configurable logging setup.
 - **Insightful Middleware:** Log requests and responses for better debugging.
+- **CORS:** Pre-configured Cross-Origin Resource Sharing (CORS) middleware.
 - **Health Checks:** Includes ready-to-use `/health` and `/live` endpoints.
+- **Testing:** Integrated testing with `pytest`.
 - **Containerized:** Comes with a `Dockerfile` for easy building and deployment.
 - **Quality Checks:** Integrated commands for type checking with `ty` and linting/formatting with `ruff`.
 
@@ -23,6 +25,7 @@ The template is considered "production-ready" due to several key features that a
 *   **Containerization:** The `Dockerfile` allows for building a consistent and isolated environment, which is a standard for reliable deployments.
 *   **Externalized Configuration:** Using an `.env` file separates configuration from code, allowing for different settings in development, testing, and production.
 *   **Monitoring & Health:** It includes structured logging and `/health` and `/live` endpoints, which are crucial for monitoring, debugging, and service orchestration (e.g., with Kubernetes).
+*   **Testing:** The included testing framework allows for writing and running tests to ensure the application is working as expected.
 *   **Scalable Architecture:** The separation of `src/app` (application logic) and `src/core` (reusable boilerplate) provides a clean architecture that is easy to maintain and scale.
 *   **Code Quality Enforcement:** Integrated linting and type checking help ensure code quality and prevent bugs, which is vital for a stable production application.
 
@@ -60,6 +63,7 @@ This project uses `make` to streamline common tasks.
 | `start`      | Build and run the Docker container in one go.                                     |
 | `build`      | Build a Docker container named `fastapi-template`.                                |
 | `run`        | Run the `fastapi-template` container with the source code mounted.                |
+| `test`       | Run tests with `pytest`.                                                          |
 | `check-ty`   | Check the code in the `/src` directory with `ty`.                                 |
 | `check-ruff` | Check the code in the `/src` directory with `ruff`.                               |
 | `check-all`  | Run both `check-ty` and `check-ruff`.                                             |
@@ -138,4 +142,13 @@ The available stages and corresponding log levels are:
 **Example `.env` configuration:**
 ```sh
 STAGE=local
+```
+
+### CORS
+
+Cross-Origin Resource Sharing (CORS) is configured via the `allowed_origins` setting in `src/app/config.py`. You can set this in your `.env` file as a comma-separated list of allowed origins.
+
+**Example `.env` configuration:**
+```sh
+allowed_origins=http://localhost:3000,https://my-frontend.com
 ```

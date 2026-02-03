@@ -14,6 +14,17 @@ class Stage(Enum):
     PROD = "prod"
 
 
+class CORSSettings(BaseSettings):
+    """CORS settings."""
+
+    model_config = SettingsConfigDict(env_prefix="CORS_")
+
+    allow_origins: list[str] = ["*"]
+    allow_credentials: bool = True
+    allow_methods: list[str] = ["*"]
+    allow_headers: list[str] = ["*"]
+
+
 class Settings(BaseSettings):
     """Application settings."""
 
@@ -25,6 +36,8 @@ class Settings(BaseSettings):
     contact: dict = {"name": "Fabian Simon Hruby", "email": "fabian.hruby@gmail.com"}
 
     stage: Stage = Stage.LOCAL
+
+    cors: CORSSettings = CORSSettings()
 
 
 settings = Settings()
