@@ -146,9 +146,17 @@ STAGE=local
 
 ### CORS
 
-Cross-Origin Resource Sharing (CORS) is configured via the `allowed_origins` setting in `src/app/config.py`. You can set this in your `.env` file as a comma-separated list of allowed origins.
+CORS settings are loaded from `src/app/config.py`. The `CORSSettings` model pulls values prefixed with `CORS_` from the environment. In `src/core/app.py`, these values are passed directly to FastAPI’s `CORSMiddleware`.
 
-**Example `.env` configuration:**
+Environment variables (prefixed with `CORS_`) can be set in `.env`:
+- `CORS_ALLOW_ORIGINS` – comma‑separated list of allowed origins, default `*`
+- `CORS_ALLOW_CREDENTIALS` – boolean, default `true`
+- `CORS_ALLOW_METHODS` – comma‑separated list of allowed methods, default `*`
+- `CORS_ALLOW_HEADERS` – comma‑separated list of allowed headers, default `*`
+
 ```sh
-allowed_origins=http://localhost:3000,https://my-frontend.com
+CORS_ALLOW_ORIGINS=http://localhost:5000,https://my-frontend.com
+CORS_ALLOW_CREDENTIALS=true
+CORS_ALLOW_METHODS=GET,POST,PUT,DELETE
+CORS_ALLOW_HEADERS=Authorization,Content-Type
 ```
