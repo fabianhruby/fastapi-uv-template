@@ -4,7 +4,7 @@ import logging
 
 STAGE_LOG_LEVEL: dict[str, str | int] = {
     "local": logging.DEBUG,
-    "dev": logging.INFO,
+    "dev": logging.DEBUG,
     "test": logging.WARNING,
     "prod": logging.INFO,
 }
