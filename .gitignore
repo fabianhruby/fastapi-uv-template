@@ -217,3 +217,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Coding Assistant
+GEMINI.md
+CLAUDE.md
+AGENTS.md
