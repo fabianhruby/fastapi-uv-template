@@ -1,6 +1,7 @@
 help:
 	@echo	"Available commands:"
-	@echo	"start		- Build and run the docker container"
+	@echo	"start		- Build and run the docker container stack with docker-compose"
+	@echo	"stop		- Stop the docker container stack with docker-compose"
 	@echo	"build		- Build a docker container from the Dockerfile named fastapi-template"
 	@echo	"run		- Run the docker container named fastapi-template with binding the source code to the container"
 	@echo	"test		- Run tests with pytest"
@@ -10,8 +11,10 @@ help:
 	@echo	""
 
 start:
-	make build
-	make run
+	docker compose up --build
+
+stop:
+	docker compose down
 
 build:
 	docker build -t fastapi-template .
