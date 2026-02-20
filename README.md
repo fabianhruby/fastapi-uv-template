@@ -13,19 +13,20 @@ A production-ready template for building high-performance APIs with FastAPI, usi
 - **Structured Logging:** Centralized and configurable logging setup.
 - **Insightful Middleware:** Log requests and responses for better debugging.
 - **CORS:** Pre-configured Cross-Origin Resource Sharing (CORS) middleware.
+- **Rate Limiting:** Protects your API with a flexible, Redis-based rate limiter.
 - **Health Checks:** Includes ready-to-use `/health` and `/live` endpoints.
-- **Testing:** Integrated testing with `pytest`.
-- **Containerized:** Comes with a `Dockerfile` for easy building and deployment.
+- **Testing:** Integrated testing with `pytest` and `pytest-docker` for seamless service testing.
+- **Containerized:** Comes with a `Dockerfile` for easy building and deployment, and `docker-compose.yml` for multi-service local development.
 - **Quality Checks:** Integrated commands for type checking with `ty` and linting/formatting with `ruff`.
 
 ### Why Production-Ready?
 
 The template is considered "production-ready" due to several key features that are essential for deploying, monitoring, and maintaining a service:
 
-*   **Containerization:** The `Dockerfile` allows for building a consistent and isolated environment, which is a standard for reliable deployments.
+*   **Containerization:** The `Dockerfile` allows for building a consistent and isolated environment, which is a standard for reliable deployments. `docker-compose.yml` simplifies multi-service development.
 *   **Externalized Configuration:** Using an `.env` file separates configuration from code, allowing for different settings in development, testing, and production.
 *   **Monitoring & Health:** It includes structured logging and `/health` and `/live` endpoints, which are crucial for monitoring, debugging, and service orchestration (e.g., with Kubernetes).
-*   **Testing:** The included testing framework allows for writing and running tests to ensure the application is working as expected.
+*   **Testing:** The included testing framework allows for writing and running tests to ensure the application is working as expected, with `pytest-docker` handling external service dependencies.
 *   **Scalable Architecture:** The separation of `src/app` (application logic) and `src/core` (reusable boilerplate) provides a clean architecture that is easy to maintain and scale.
 *   **Code Quality Enforcement:** Integrated linting and type checking help ensure code quality and prevent bugs, which is vital for a stable production application.
 
@@ -45,13 +46,15 @@ Before you begin, ensure you have the following installed:
     ```
     You can then edit the `.env` file to change the `stage` or other settings.
 
-2.  **Build and run the application:**
-    Use the following command to build and run the Docker container.
+2.  **Start the application and its services (Redis):**
+    Use the following command to build and run the FastAPI application and the Redis database using Docker Compose.
     ```sh
-    make start
+    make up
     ```
+    This will start the `fastapi` service and the `redis` service in detached mode.
 
-The application will be available at `http://localhost:8000`. The health check endpoints are at `http://localhost:8000/health` and `http://localhost:8000/live`.
+3.  **Access the application:**
+    The application will be available at `http://localhost:8000`. The health check endpoints are at `http://localhost:8000/health` and `http://localhost:8000/live`.
 
 ## 🛠️ Usage
 
@@ -60,10 +63,10 @@ This project uses `make` to streamline common tasks.
 | Command      | Description                                                                       |
 |--------------|-----------------------------------------------------------------------------------|
 | `help`       | List all available commands.                                                      |
-| `start`      | Build and run the Docker container in one go.                                     |
-| `build`      | Build a Docker container named `fastapi-template`.                                |
-| `run`        | Run the `fastapi-template` container with the source code mounted.                |
-| `test`       | Run tests with `pytest`.                                                          |
+| `up`         | Start the Docker Compose services (fastapi and redis) in detached mode.               |
+| `down`       | Stop and remove the Docker Compose services.                                      |
+| `logs`       | View real-time logs from the Docker Compose services.                             |
+| `test`       | Run tests with `pytest`. A temporary Redis container will be managed by `pytest-docker` for tests. |
 | `check-ty`   | Check the code in the `/src` directory with `ty`.                                 |
 | `check-ruff` | Check the code in the `/src` directory with `ruff`.                               |
 | `check-all`  | Run both `check-ty` and `check-ruff`.                                             |
@@ -159,4 +162,26 @@ CORS_ALLOW_ORIGINS=http://localhost:5000,https://my-frontend.com
 CORS_ALLOW_CREDENTIALS=true
 CORS_ALLOW_METHODS=GET,POST,PUT,DELETE
 CORS_ALLOW_HEADERS=Authorization,Content-Type
+```
+
+### Rate Limiting
+
+The application includes a middleware for rate limiting to protect your API from excessive traffic. It uses a fixed-window algorithm implemented with Redis.
+
+Rate limiting settings are loaded from `src/app/config.py`. The `RateLimitingSettings` model pulls values prefixed with `RATE_LIMITING_` from the environment, and `RedisSettings` uses the `REDIS_` prefix.
+
+When using `docker-compose.yml` for development, the `REDIS_URL` for the `web` service will automatically be set to `redis://redis:6379/0` to connect to the `redis` service. For local development outside of Docker Compose, `REDIS_URL` defaults to `redis://localhost:6379/0`.
+
+Environment variables can be set in `.env`:
+- `REDIS_URL` – The connection URL for your Redis instance (e.g., `redis://localhost:6379/0`).
+- `RATE_LIMITING_DEFAULT_LIMIT` – The default number of requests allowed in a time window for an IP address, default `100`.
+- `RATE_LIMITING_WINDOW_SECONDS` – The duration of the time window in seconds, default `3600` (1 hour).
+- `RATE_LIMITING_PATH_LIMITS` – A JSON string defining an array of path-specific limits. Each object in the array must contain `path`, `limit`, and `window_seconds`.
+
+**Example `.env` configuration:**
+```sh
+REDIS_URL=redis://localhost:6379/0 # Used for local, non-Docker Compose development
+RATE_LIMITING_DEFAULT_LIMIT=200
+RATE_LIMITING_WINDOW_SECONDS=60
+RATE_LIMITING_PATH_LIMITS='[{"path": "/health", "limit": 10, "window_seconds": 60}, {"path": "/live", "limit": 10, "window_seconds": 60}]'
 ```
