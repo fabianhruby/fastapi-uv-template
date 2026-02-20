@@ -19,3 +19,5 @@ def configure_logging(settings) -> None:
         force=True,
     )
     logging.getLogger("uvicorn.access").setLevel(logging.WARNING)
+    logging.getLogger("watchfile.main").setLevel(logging.WARNING)
+    logging.getLogger("httpx").setLevel(logging.WARNING)
