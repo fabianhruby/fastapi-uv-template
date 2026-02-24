@@ -1,6 +1,7 @@
 """Rate limiting middleware."""
 
-from fastapi import HTTPException, Request, Response
+from fastapi import Request, Response
+from fastapi.responses import JSONResponse
 from redis.asyncio import Redis
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 
@@ -22,7 +23,7 @@ class RedisRateLimitingMiddleware(BaseHTTPMiddleware):
         self.redis_client: Redis = redis_client
         self.default_limit: int = default_limit
         self.window_seconds: int = window_seconds
-        self.path_limits: list[dict[str, str | int | float]] = {
+        self.path_limits: dict[str, PathRateLimit] = {
             limit.path: limit for limit in path_limits
         }
 
@@ -36,7 +37,7 @@ class RedisRateLimitingMiddleware(BaseHTTPMiddleware):
         path = request.url.path
 
         # Check if there is a limit for a specific path
-        path_limit: dict[str, str | int | float] = self.path_limits.get(path)
+        path_limit: PathRateLimit | None = self.path_limits.get(path)
         if path_limit:
             limit: int | float = path_limit.limit
             window: int | float = path_limit.window_seconds
@@ -52,6 +53,9 @@ class RedisRateLimitingMiddleware(BaseHTTPMiddleware):
             await self.redis_client.expire(key, window)
 
         if current > limit:
-            raise HTTPException(status_code=429, detail="Rate limit exceeded")
+            return JSONResponse(
+                status_code=429,
+                content={"detail": "Rate limit exceeded"},
+            )
 
         return await call_next(request)
