@@ -27,7 +27,7 @@ dev = [
     "ruff>=0.14.14",
     "ty>=0.0.14",
     "pytest>=8.5.2",
-    "pytest-docker>=2.0.1",
+    "fakeredis>=2.0.0",
 ]
 
 [tool.setuptools]

@@ -1,30 +1,29 @@
 """Core router with health and live checks included."""
 
 from fastapi import APIRouter
-from fastapi.responses import JSONResponse
 
 core_router = APIRouter()
 
 
 @core_router.get(path="/health")
-async def health() -> JSONResponse:
+async def health() -> dict[str, str]:
     """Check if the app is healthy.
 
     Return
     -------
-    JSONResponse
+    dict
         A JSON response indicating the health status of the app.
     """
-    return JSONResponse(content={"status": "ready"})
+    return {"status": "ready"}
 
 
 @core_router.get(path="/live")
-async def live() -> JSONResponse:
+async def live() -> dict[str, str]:
     """Check if the app is live.
 
     Returns
     -------
-    JSONResponse
+    dict
         A JSON response indicating the live status of the app.
     """
-    return JSONResponse(content={"status": "alive"})
+    return {"status": "alive"}
