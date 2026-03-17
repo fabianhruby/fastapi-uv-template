@@ -15,7 +15,7 @@ A production-ready template for building high-performance APIs with FastAPI, usi
 - **CORS:** Pre-configured Cross-Origin Resource Sharing (CORS) middleware.
 - **Rate Limiting:** Protects your API with a flexible, Redis-based rate limiter.
 - **Health Checks:** Includes ready-to-use `/health` and `/live` endpoints.
-- **Testing:** Integrated testing with `pytest` and `pytest-docker` for seamless service testing.
+- **Testing:** Integrated testing with `pytest` and `fakeredis` for lightweight, in-process Redis mocking.
 - **Containerized:** Comes with a `Dockerfile` for easy building and deployment, and `docker-compose.yml` for multi-service local development.
 - **Quality Checks:** Integrated commands for type checking with `ty` and linting/formatting with `ruff`.
 
@@ -26,7 +26,7 @@ The template is considered "production-ready" due to several key features that a
 *   **Containerization:** The `Dockerfile` allows for building a consistent and isolated environment, which is a standard for reliable deployments. `docker-compose.yml` simplifies multi-service development.
 *   **Externalized Configuration:** Using an `.env` file separates configuration from code, allowing for different settings in development, testing, and production.
 *   **Monitoring & Health:** It includes structured logging and `/health` and `/live` endpoints, which are crucial for monitoring, debugging, and service orchestration (e.g., with Kubernetes).
-*   **Testing:** The included testing framework allows for writing and running tests to ensure the application is working as expected, with `pytest-docker` handling external service dependencies.
+*   **Testing:** The included testing framework allows for writing and running tests to ensure the application is working as expected. `fakeredis` provides a lightweight in-process Redis mock, so no external service is needed to run tests.
 *   **Scalable Architecture:** The separation of `src/app` (application logic) and `src/core` (reusable boilerplate) provides a clean architecture that is easy to maintain and scale.
 *   **Code Quality Enforcement:** Integrated linting and type checking help ensure code quality and prevent bugs, which is vital for a stable production application.
 
@@ -66,7 +66,7 @@ This project uses `make` to streamline common tasks.
 | `up`         | Start the Docker Compose services (fastapi and redis) in detached mode.               |
 | `down`       | Stop and remove the Docker Compose services.                                      |
 | `logs`       | View real-time logs from the Docker Compose services.                             |
-| `test`       | Run tests with `pytest`. A temporary Redis container will be managed by `pytest-docker` for tests. |
+| `test`       | Run tests with `pytest`. Redis is mocked in-process using `fakeredis` — no external container needed. |
 | `check-ty`   | Check the code in the `/src` directory with `ty`.                                 |
 | `check-ruff` | Check the code in the `/src` directory with `ruff`.                               |
 | `check-all`  | Run both `check-ty` and `check-ruff`.                                             |
