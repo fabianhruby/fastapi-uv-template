@@ -1,11 +1,24 @@
 """Rate limiting middleware."""
 
+import logging
+
 from fastapi import Request, Response
 from fastapi.responses import JSONResponse
 from redis.asyncio import Redis
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 
-from app.config import PathRateLimit
+from core.middleware.rate_limiting.models import PathRateLimit
+
+logger = logging.getLogger(__name__)
+
+# Atomically increments the key and sets expiry on first access.
+_INCR_EXPIRE_SCRIPT = """
+local current = redis.call('INCR', KEYS[1])
+if current == 1 then
+    redis.call('EXPIRE', KEYS[1], ARGV[1])
+end
+return current
+"""
 
 
 class RedisRateLimitingMiddleware(BaseHTTPMiddleware):
@@ -36,21 +49,29 @@ class RedisRateLimitingMiddleware(BaseHTTPMiddleware):
         client_ip: str = request.client.host if request.client else "unknown"
         path = request.url.path
 
-        # Check if there is a limit for a specific path
         path_limit: PathRateLimit | None = self.path_limits.get(path)
         if path_limit:
-            limit: int | float = path_limit.limit
-            window: int | float = path_limit.window_seconds
-
+            limit: int = path_limit.limit
+            window: int = path_limit.window_seconds
         else:
-            limit: int | float = self.default_limit
-            window: int | float = self.window_seconds
+            limit = self.default_limit
+            window = self.window_seconds
 
         key = f"rate_limit:{path}:{client_ip}"
 
-        current = await self.redis_client.incr(key)
-        if current == 1:
-            await self.redis_client.expire(key, window)
+        try:
+            current = await self.redis_client.eval(
+                _INCR_EXPIRE_SCRIPT,
+                1,
+                key,
+                window,
+            )  # pyright: ignore[reportGeneralTypeIssues]
+        except Exception:
+            logger.exception("Redis unavailable, returning 503")
+            return JSONResponse(
+                status_code=503,
+                content={"detail": "Service temporarily unavailable"},
+            )
 
         if current > limit:
             return JSONResponse(

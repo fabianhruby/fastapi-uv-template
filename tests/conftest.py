@@ -10,8 +10,9 @@ from core.app import create_app
 @pytest.fixture
 def client():
     mock_redis = AsyncMock()
-    mock_redis.incr.return_value = 1
+    mock_redis.eval.return_value = 1
 
     with patch("core.app.get_redis_client", return_value=mock_redis):
         app = create_app(settings=settings)
-        yield TestClient(app)
+        with TestClient(app) as client:
+            yield client

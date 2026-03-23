@@ -8,6 +8,8 @@ from typing import Any
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from core.middleware.rate_limiting.models import PathRateLimit
+
 
 class Stage(Enum):
     """Represents the deployment stage."""
@@ -24,7 +26,7 @@ class CORSSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="CORS_")
 
     allow_origins: list[str] = ["*"]
-    allow_credentials: bool = True
+    allow_credentials: bool = False
     allow_methods: list[str] = ["*"]
     allow_headers: list[str] = ["*"]
 
@@ -37,14 +39,6 @@ class RedisSettings(BaseSettings):
     url: str = "redis://localhost:6379/0"
     encoding: str = "utf-8"
     decode_responses: bool = True
-
-
-class PathRateLimit(BaseSettings):
-    """Defines a rate limit for a specific path."""
-
-    path: str
-    limit: int
-    window_seconds: int
 
 
 class RateLimitingSettings(BaseSettings):

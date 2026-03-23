@@ -1,5 +1,7 @@
 """Core application entry point."""
 
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -15,11 +17,19 @@ def create_app(settings) -> FastAPI:
     """Create a FastAPI App with health and live check endpoints."""
     configure_logging(settings=settings)
 
+    redis_client = get_redis_client(settings=settings.rate_limiting.redis)
+
+    @asynccontextmanager
+    async def lifespan(_app: FastAPI):
+        yield
+        await redis_client.aclose()
+
     app = FastAPI(
         title=settings.title,
         summary=settings.summary,
         description=settings.description,
         contact=settings.contact,
+        lifespan=lifespan,
     )
 
     app.include_router(router=core_router)
@@ -33,7 +43,7 @@ def create_app(settings) -> FastAPI:
     )
     app.add_middleware(
         RedisRateLimitingMiddleware,  # ty:ignore
-        redis_client=get_redis_client(settings=settings.rate_limiting.redis),
+        redis_client=redis_client,
         default_limit=settings.rate_limiting.default_limit,
         window_seconds=settings.rate_limiting.window_seconds,
         path_limits=settings.rate_limiting.path_limits,
