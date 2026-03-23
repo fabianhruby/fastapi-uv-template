@@ -26,7 +26,8 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         except Exception:
             duration_ms: float = round((time.perf_counter() - start) * 1000, 2)
             self.logger.exception(
-                {
+                "Request failed",
+                extra={
                     "method": request.method,
                     "path": request.url.path,
                     "status": None,
@@ -38,7 +39,8 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         duration_ms: float = round((time.perf_counter() - start) * 1000, 2)
 
         self.logger.info(
-            {
+            "Request processed",
+            extra={
                 "method": request.method,
                 "path": request.url.path,
                 "status": response.status_code,
