@@ -1,6 +1,7 @@
 """Rate limiting middleware."""
 
 import logging
+
 from collections.abc import Awaitable
 from typing import cast
 
