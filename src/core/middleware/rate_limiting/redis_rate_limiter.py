@@ -1,6 +1,8 @@
 """Rate limiting middleware."""
 
 import logging
+from collections.abc import Awaitable
+from typing import cast
 
 from fastapi import Request, Response
 from fastapi.responses import JSONResponse
@@ -60,12 +62,10 @@ class RedisRateLimitingMiddleware(BaseHTTPMiddleware):
         key = f"rate_limit:{path}:{client_ip}"
 
         try:
-            current = await self.redis_client.eval(
-                _INCR_EXPIRE_SCRIPT,
-                1,
-                key,
-                window,
-            )  # pyright: ignore[reportGeneralTypeIssues]
+            current = await cast(
+                Awaitable[int],
+                self.redis_client.eval(_INCR_EXPIRE_SCRIPT, 1, key, window),
+            )
         except Exception:
             logger.exception("Redis unavailable, returning 503")
             return JSONResponse(
